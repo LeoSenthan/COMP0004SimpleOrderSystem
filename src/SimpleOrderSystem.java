@@ -6,6 +6,7 @@ public class SimpleOrderSystem
   public static final int ADD_ORDER = 2;
   public static final int ADD_PRODUCT = 3;
   public static final int LIST_CUSTOMERS = 4;
+  public static final int LIST_TOTAL = 5;
   public static final int QUIT = 10;
   private Input in = new Input();
   private ArrayList<Customer> customers;
@@ -38,6 +39,7 @@ public class SimpleOrderSystem
     System.out.println(ADD_ORDER + ". Add Order");
     System.out.println(ADD_PRODUCT + ". Add Product");
     System.out.println(LIST_CUSTOMERS + ". List Customers");
+    System.out.println(LIST_TOTAL + ". Output Total Of All Orders");
     System.out.println();
     System.out.println(QUIT + ". Quit");
   }
@@ -57,6 +59,9 @@ public class SimpleOrderSystem
          break;
       case LIST_CUSTOMERS:
         listCustomers();
+        break;
+      case LIST_TOTAL:
+        outputTotalOrders();
         break;
       default:
         System.out.println("Invalid option - try again");
@@ -80,11 +85,13 @@ public class SimpleOrderSystem
     String lastName = in.nextLine();
     System.out.println("Enter address:");
     String address = in.nextLine();
+    System.out.println("Enter postcode:");
+    String postcode = in.nextLine();
     System.out.println("Enter phone number:");
     String phone = in.nextLine();
     System.out.println("Enter email address:");
     String email = in.nextLine();
-    Customer customer = new Customer(firstName,lastName,address,phone,email);
+    Customer customer = new Customer(firstName,lastName,address,postcode,phone,email);
     customers.add(customer);
   }
 
@@ -187,13 +194,32 @@ public class SimpleOrderSystem
     {
       return;
     }
-    System.out.print("Enter product description: ");
-    String description = in.nextLine();
+    System.out.print("1: Book Product\n2: Other Products");
+    int choice = in.nextInt();
+    if (!(choice == 1 || choice == 2)){
+      return;
+    }
     System.out.print("Enter product price: ");
     int price = in.nextInt();
-    in.nextLine();
-    Product product = new Product(code,description,price);
-    products.add(product);
+    if (choice == 1){
+      System.out.print("Enter title:");
+      String title = in.nextLine();
+      System.out.print("Enter author:");
+      String author = in.nextLine();
+      System.out.print("Enter publiciation date: ");
+      String publication_date = in.nextLine();
+      System.out.print("Enter summary: ");
+      String description = in.nextLine();
+      Book product = new Book(code, price, description, title, author, publication_date);
+      products.add(product);
+    }
+    else{
+      System.out.print("Enter product description: ");
+      String description = in.nextLine();
+      in.nextLine();
+      Product product = new RegularProduct(code,price,description);
+        products.add(product);
+    }
   }
 
   private boolean isAvailableProductCode(int code)
@@ -221,6 +247,7 @@ public class SimpleOrderSystem
                                   + ", "
                                   + customer.getFirstName());
       System.out.println("Address: " + customer.getAddress());
+      System.out.println("Postcode: "+customer.getPostcode());
       System.out.println("Phone: " + customer.getPhone());
       System.out.println("Email: " + customer.getEmail());
       System.out.println("Orders made: " + customer.getOrders().size());
@@ -228,9 +255,20 @@ public class SimpleOrderSystem
     }
   }
 
+  public void outputTotalOrders(){
+    int total = 0;
+    for (Customer customer: customers){
+      total = total + customer.getTotalForAllOrders();
+    }
+    System.out.println("Total for all orders for all customers: "+total);
+  }
   public static void main(String[] args)
   {
     SimpleOrderSystem orderSystem = new SimpleOrderSystem();
+    Customer customer = new Customer("Leo","Senthan","1","1","1","1");
+    orderSystem.customers.add(customer);
+    Product product = new RegularProduct(123,1,"1");
+    orderSystem.products.add(product);
     orderSystem.run();
   }
 }
